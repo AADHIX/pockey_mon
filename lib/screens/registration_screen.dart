@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -30,15 +31,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   void registerUser() async {
     if (formkey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: emailController.text,
             password: passwordController.text
         );
-        // Registration successful, navigate to login screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
+        String uid = userCredential.user!.uid;
+        Map<String, dynamic> userData = {
+          'name': nameController.text,
+          'email': emailController.text,
+        };
+        FirebaseFirestore.instance.collection('users').doc(uid).set(userData).then((value) {
+          // Registration successful, navigate to login screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        });
+
       } on FirebaseAuthException catch (e) {
         String errorMessage;
         if (e.code == 'weak-password') {
