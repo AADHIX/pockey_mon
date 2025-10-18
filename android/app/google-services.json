@@ -1,0 +1,30 @@
+{
+    "project_info": {
+      "project_number": "523646307455",
+      "project_id": "pockeymon-57125",
+      "storage_bucket": "pockeymon-57125.firebasestorage.app"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:523646307455:android:682788f2a834eb85bd034a",
+          "android_client_info": {
+            "package_name": "com.example.pockey_mon"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyDgtg1Xjz4c55MAxZG262Cyprfw-5OrfTE"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }
+  

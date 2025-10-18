@@ -14,7 +14,7 @@ class LoadingAnimatedButton extends StatefulWidget {
   final double borderWidth;
 
   const LoadingAnimatedButton({
-    Key? key,
+    super.key,
     required this.child,
     required this.onTap,
     this.width = 220,
@@ -24,7 +24,7 @@ class LoadingAnimatedButton extends StatefulWidget {
     this.borderRadius = 15.0,
     this.borderWidth = 3.0,
     this.duration = const Duration(milliseconds: 1500),
-  }) : super(key: key);
+  });
 
   @override
   State<LoadingAnimatedButton> createState() => _LoadingAnimatedButtonState();

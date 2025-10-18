@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pockey_mon/screens/home_screen.dart';
 import 'package:pockey_mon/screens/registration_screen.dart';
 import 'package:pockey_mon/widgets/button.dart';
 
@@ -21,6 +23,55 @@ class _LoginScreenState extends State<LoginScreen> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  void loginUser() {
+    if (formkey.currentState!.validate()) {
+      FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text)
+          .then((value) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          if (user.emailVerified) {
+            // Navigate to home screen upon successful login
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
+          } else {
+            FirebaseAuth.instance.signOut();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Please verify your email to login.'),
+                action: SnackBarAction(
+                  label: 'Resend',
+                  onPressed: () {
+                    user.sendEmailVerification();
+                  },
+                ),
+              ),
+            );
+          }
+        }
+      }).catchError((e) {
+        String errorMessage;
+        if (e is FirebaseAuthException) {
+          if (e.code == 'user-not-found') {
+            errorMessage = 'No user found for that email.';
+          } else if (e.code == 'wrong-password') {
+            errorMessage = 'Wrong password provided for that user.';
+          } else {
+            errorMessage = 'An unknown error occurred.';
+          }
+        } else {
+          errorMessage = 'An unknown error occurred.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      });
+    }
   }
 
   @override
@@ -51,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(
+                const Text(
                   "Enter valid email and password",
                   style: TextStyle(
                     fontSize: 18,
@@ -63,6 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    key: const Key('emailField'),
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
@@ -110,6 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    key: const Key('passwordField'),
                     controller: passwordController,
                     obscureText: obscureText,
                     decoration: InputDecoration(
@@ -160,12 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: LoadingAnimatedButton(
-                    onTap: () {
-                      if (formkey.currentState!.validate()) {
-                        // Handle login logic here
-                        print('Login successful');
-                      }
-                    },
+                    onTap: loginUser,
                     child: const Text(
                       "Login",
                       style: TextStyle(
@@ -188,11 +236,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => RegistrationScreen(),
+                            builder: (_) => const RegistrationScreen(),
                           ),
                         );
                       },
-
                       child: Text(
                         "Sign Up",
                         style: TextStyle(
